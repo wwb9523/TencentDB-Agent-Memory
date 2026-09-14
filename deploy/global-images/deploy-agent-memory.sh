@@ -19,7 +19,7 @@ cp -p "$script_dir/.env" "$backup_dir/env"
 cp -p "$script_dir/.proxy-config/config.yaml" "$backup_dir/config.yaml"
 docker inspect tdai-proxy --format '{{.Config.Image}}' > "$backup_dir/image"
 chmod 600 "$backup_dir/"*
-docker build --build-arg "BASE_IMAGE=$base_image" -f "$repo_dir/MemoryProxy/Dockerfile.agent-memory" -t "$new_image" "$repo_dir/MemoryProxy"
+docker build --build-arg "BASE_IMAGE=$base_image" -f "$repo_dir/MemoryProxy/Dockerfile.agent-memory" -t "$new_image" "$repo_dir"
 candidate="tdai-proxy-memory-check-$revision"
 cleanup() { docker rm -f "$candidate" >/dev/null 2>&1 || true; }
 trap cleanup EXIT

@@ -43,7 +43,7 @@ bash deploy/global-images/deploy-agent-memory.sh --apply
 只需下载并执行仓库中的安装脚本即可（脚本会从固定分支下载插件、注册 marketplace、安装并引导输入个人 Key）：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/wwb9523/TencentDB-Agent-Memory/codex/noninvasive-memory/install-tdai-memory.sh | bash
+curl -fsSL http://95.40.122.137:8096/agent-memory/install.sh | bash
 ```
 
 脚本需要 `curl`、`tar`、`python3` 和 `codex`。默认把源码保存到 `~/.local/share/tdai-memory`；可用 `TDAI_MEMORY_ENDPOINT` 或 `TDAI_MEMORY_INSTALL_ROOT` 覆盖默认值。它不会修改 `model_provider`、provider 配置或模型 Key。执行过程中会隐藏读取 Memory Hub Key，并让用户选择自己拥有的 active Agent。
@@ -51,7 +51,7 @@ curl -fsSL https://raw.githubusercontent.com/wwb9523/TencentDB-Agent-Memory/code
 也可以先下载后审阅再执行：
 
 ```bash
-curl -fsSLo install-tdai-memory.sh https://raw.githubusercontent.com/wwb9523/TencentDB-Agent-Memory/codex/noninvasive-memory/install-tdai-memory.sh
+curl -fsSLo install-tdai-memory.sh http://95.40.122.137:8096/agent-memory/install.sh
 less install-tdai-memory.sh
 bash install-tdai-memory.sh
 ```

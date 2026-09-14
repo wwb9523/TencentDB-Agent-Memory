@@ -138,6 +138,17 @@ export function createApp(config: ProxyConfig): Hono {
   // 让 LLM 用 Bash 调 <proxy>/memory-bridge/v3/atomic/search 等，proxy 注入身份。
   const memoryBridgeHandler = createMemoryBridgeHandler(config);
   app.post("/memory-bridge/*", (c) => memoryBridgeHandler(c));
+  // Public, read-only installer entrypoint. The script itself contains no
+  // credentials; it downloads the pinned plugin source and asks the user for
+  // their personal Memory Hub key interactively.
+  app.get("/agent-memory/install.sh", async (c) => {
+    try {
+      const script = await (await import("node:fs/promises")).readFile("/app/install-tdai-memory.sh", "utf8");
+      return c.body(script, 200, { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=300" });
+    } catch {
+      return c.json({ error: "installer_unavailable" }, 503);
+    }
+  });
   // Independent tool API: no model-provider change or Proxy session-init.
   app.route("/agent-memory/v1", createAgentMemoryRouter(config));
 

