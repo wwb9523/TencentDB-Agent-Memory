@@ -18,7 +18,7 @@ need curl; need tar; need python3; need codex
 
 tmp="$(mktemp -d "${TMPDIR:-/tmp}/tdai-memory.XXXXXX")"
 trap 'rm -rf "$tmp"' EXIT
-echo "下载插件（分支 $BRANCH）..."
+echo "下载插件（分支 ${BRANCH}）..."
 curl --fail --location --silent --show-error "$ARCHIVE_URL" -o "$tmp/repo.tar.gz"
 mkdir -p "$tmp/extract"
 tar -xzf "$tmp/repo.tar.gz" -C "$tmp/extract"
