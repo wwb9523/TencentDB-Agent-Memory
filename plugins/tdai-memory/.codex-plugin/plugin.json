@@ -1,7 +1,7 @@
 {
   "name": "tdai-memory",
-  "version": "0.1.0",
-  "description": "Provider-independent L0–L3 memory for Codex using hooks and MCP.",
+  "version": "0.1.0+codex.20260914090050",
+  "description": "Provider-independent L0\u2013L3 memory for Codex using hooks and MCP.",
   "author": {
     "name": "TDAI Memory contributors"
   },

@@ -47,7 +47,10 @@ def api(cfg, operation, args=None):
         headers={"Content-Type": "application/json", "Authorization": "Bearer " + cfg["user_key"],
                  "x-tdai-service-id": cfg["service_id"]}, method="POST")
     try:
-        with urllib.request.build_opener(NoRedirect()).open(request, timeout=12) as response:
+        # urllib on macOS otherwise silently inherits System Settings proxies.
+        # Honor explicit HTTP(S)_PROXY/NO_PROXY only; default to direct access.
+        proxy = urllib.request.ProxyHandler(urllib.request.getproxies_environment())
+        with urllib.request.build_opener(proxy, NoRedirect()).open(request, timeout=12) as response:
             result = json.load(response)
     except urllib.error.HTTPError as error:
         # Our server returns fixed error codes; don't echo arbitrary HTTP bodies.
@@ -80,6 +83,15 @@ def database(cfg):
 
 def utc_now():
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def utf16_length(text):
+    return len(text.encode("utf-16-le")) // 2
+
+
+def query_prefix(text):
+    # Core's JS validator counts UTF-16 units; never split a surrogate pair.
+    return text.encode("utf-16-le")[:4096].decode("utf-16-le", errors="ignore")
 
 
 def capture_pending(cfg, limit=1):
@@ -118,13 +130,13 @@ def hook(event, cfg):
             return {}
         warning = None
         if cfg.get("capture", False):
-            if len(prompt) > 64000:
+            if utf16_length(prompt) > 64000:
                 warning = "TDAI capture skipped: prompt exceeds 64000 characters."
             else:
                 with database(cfg) as db:
                     db.execute("INSERT OR IGNORE INTO turns(scope,session,turn,prompt,timestamp) VALUES(?,?,?,?,?)",
                                (scope(cfg), session, turn, prompt, utc_now()))
-        data = api(cfg, "recall", {"query": prompt[:2048], "limit": 5})
+        data = api(cfg, "recall", {"query": query_prefix(prompt), "limit": 5})
         result = {"hookSpecificOutput": {"hookEventName": name, "additionalContext": format_context(data)}}
         if warning:
             result["systemMessage"] = warning
@@ -133,7 +145,7 @@ def hook(event, cfg):
         answer = event.get("last_assistant_message")
         if event.get("stop_hook_active") or not isinstance(answer, str) or not answer.strip():
             return {}
-        if len(answer) > 64000:
+        if utf16_length(answer) > 64000:
             return {"systemMessage": "TDAI capture skipped: answer exceeds 64000 characters."}
         with database(cfg) as db:
             # First final answer wins. A repeat Stop cannot change the retry payload.
@@ -163,7 +175,7 @@ def tool_call(cfg, name, args):
         raise ValueError("Invalid tool arguments")
     for key, value in args.items():
         spec = properties[key]
-        if spec["type"] == "string" and (not isinstance(value, str) or not value.strip() or len(value) > spec.get("maxLength", 64000)):
+        if spec["type"] == "string" and (not isinstance(value, str) or not value.strip() or utf16_length(value) > spec.get("maxLength", 64000)):
             raise ValueError("Invalid " + key)
         if spec["type"] == "integer" and (type(value) is not int or not spec["minimum"] <= value <= spec["maximum"]):
             raise ValueError("Invalid " + key)

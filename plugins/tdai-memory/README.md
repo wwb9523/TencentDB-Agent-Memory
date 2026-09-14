@@ -34,6 +34,8 @@ bash deploy/global-images/deploy-agent-memory.sh --apply
 
 公网 HTTP 会明文传输记忆查询、回写和个人 Key。安全组限制到团队出口 IP；长期入口建议配置 HTTPS。模型 Key 始终由用户自己的 provider 管理，不提供给本插件。
 
+插件默认直连，只采用显式 `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` 环境变量，不自动继承 macOS 系统代理。自动召回使用提问前 2048 UTF-16 单元作为检索词，原始提问回写独立保存；64000 UTF-16 单元以内的长提问 / 回答按 Core 单条 8192 单元限制分块写入，超限会提示并跳过该轮回写。普通汉字计一个单元，大部分 emoji 计两个，截断和分块不会拆开 emoji。
+
 ## 2. 同事安装
 
 需要 Python 3.9+、Git，以及支持插件和 UserPromptSubmit / Stop Hooks 的 Codex 版本。本次开发环境为 CLI 0.149.1；先运行 `codex --version`、`codex plugin --help`，旧版本应升级。
@@ -85,6 +87,8 @@ MCP 工具：
 | `memory_read_scene` | 按召回返回的路径读取 L2 全文 |
 | `memory_save` | 用户明确要求时保存一条记忆，进入 L0 和后续异步提炼 |
 
+读取场景时，使用 `memory_recall` 返回的 `scenarios.entries[].path`（例如 `qa-integration.md`）。画像正文中的导航路径可能带 `scene_blocks/` 前缀，不能直接作为该 API 的路径。
+
 首版不覆盖云端 Skill / Wiki / CodeGraph 管理、其他 Agent 的记忆导入、多副本写入回执或中断回合的自动回写。Skill 在这里用于指导记忆工具使用，不是把远程 Skill 资产全部同步到本机。
 
 ## 4. 验证与维护
@@ -127,5 +131,14 @@ python3 -m unittest discover -s plugins/tdai-memory/tests -v
 ```
 
 服务端 API 测试覆盖鉴权、用户 / Team 隔离、非本人访问拒绝、输入限制、跨会话召回、持久回执及不确定写入保护。客户端测试覆盖 Hook 上下文、原始提问回写、重复 Hook、失败重试、配置作用域隔离和 MCP JSON-RPC。
+
+真实公网联调必须使用独立的 QA Agent 和私有配置文件；命令会写入一轮合成问答：
+
+```bash
+python3 plugins/tdai-memory/tests/remote_smoke.py \
+  --config /absolute/path/to/qa-config.json --allow-qa-write
+```
+
+配置格式与个人配置相同，但 Agent 名称须包含 `QA`，并应设置单独的 `state_dir`。此脚本测试 Hook 进程、MCP stdio 和远程 API；它不代替桌面端的 Hook 信任和真实客户端触发验收。已完成的部署和测试范围见 [部署验证记录](VALIDATION.md)。
 
 参考：[Codex Hooks](https://learn.chatgpt.com/docs/hooks)、[Codex MCP](https://developers.openai.com/codex/mcp/)、[插件格式](https://developers.openai.com/plugins/build/plugins)。

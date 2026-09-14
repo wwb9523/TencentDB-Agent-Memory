@@ -64,6 +64,8 @@ describe("provider-independent memory API", () => {
     expect((await x.post("delete", {})).status).toBe(404);
     expect((await x.post("search", { query: "x", layer: "../../meta/user/delete" })).status).toBe(400);
     expect((await x.post("recall", { query: "x", limit: 1000 })).status).toBe(400);
+    expect((await x.post("recall", { query: "x", limit: 0 })).status).toBe(400);
+    expect((await x.post("agents", { offset: 0, limit: 1 })).status).toBe(200);
     expect((await x.post("capture", { ...turn, answer: "x".repeat(270000) })).status).toBe(413);
   });
   it("keeps durable receipts across router restart and rejects changed payloads", async () => {

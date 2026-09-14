@@ -1,4 +1,5 @@
 import importlib.util
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -66,6 +67,27 @@ class MemoryTests(unittest.TestCase):
     def test_tools_reject_identity_override(self):
         with self.assertRaises(ValueError):
             memory.tool_call(self.cfg, "memory_search", {"query": "x", "layer": "atomic", "user_id": "victim"})
+
+    def test_api_ignores_system_proxy_and_honors_explicit_environment(self):
+        for proxies in ({}, {"http": "http://explicit-proxy:8080"}):
+            with self.subTest(proxies=proxies), \
+                 patch.object(memory.urllib.request, "getproxies_environment", return_value=proxies), \
+                 patch.object(memory.urllib.request, "getproxies", side_effect=AssertionError("system proxy queried")), \
+                 patch.object(memory.urllib.request, "build_opener") as build:
+                build.return_value.open.return_value = io.StringIO('{"data":{"ok":true}}')
+                self.assertEqual(memory.api(self.cfg, "status"), {"ok": True})
+                self.assertEqual(build.call_args.args[0].proxies, proxies)
+                self.assertIsInstance(build.call_args.args[1], memory.NoRedirect)
+
+    def test_unicode_queries_fit_core_without_losing_capture(self):
+        prompt = "x" * 2047 + "😀" * 20
+        with patch.object(memory, "api", return_value={}) as api:
+            memory.hook({**self.start, "prompt": prompt}, self.cfg)
+            self.assertEqual(api.call_args.args[2]["query"], "x" * 2047)
+            memory.hook(self.stop, self.cfg)
+            self.assertEqual(api.call_args.args[2]["prompt"], prompt)
+        with self.assertRaises(ValueError):
+            memory.tool_call(self.cfg, "memory_recall", {"query": "😀" * 2048})
 
     def test_mcp_stdio_initialization_and_tools(self):
         messages = [

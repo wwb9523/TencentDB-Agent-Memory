@@ -18,9 +18,9 @@ function str(value: unknown, name: string, max = 200): string {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new ApiError(400, `invalid_${name}`);
   return value;
 }
-function integer(value: unknown, fallback: number, max: number): number {
+function integer(value: unknown, fallback: number, max: number, min = 1): number {
   if (value === undefined) return fallback;
-  if (!Number.isInteger(value) || Number(value) < 0 || Number(value) > max) throw new ApiError(400, "invalid_limit_or_offset");
+  if (!Number.isInteger(value) || Number(value) < min || Number(value) > max) throw new ApiError(400, "invalid_limit_or_offset");
   return Number(value);
 }
 
@@ -69,7 +69,7 @@ export function createAgentMemoryRouter(config: ProxyConfig, options: {
       const userId = verified.user.user_id;
       if (operation === "agents") {
         const page = await core("meta/agent/list", {
-          owner_user_id: userId, limit: integer(b.limit, 50, 100), offset: integer(b.offset, 0, 100000),
+          owner_user_id: userId, limit: integer(b.limit, 50, 100), offset: integer(b.offset, 0, 100000, 0),
         });
         return c.json({ data: page });
       }
