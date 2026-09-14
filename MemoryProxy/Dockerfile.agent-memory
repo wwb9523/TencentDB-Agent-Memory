@@ -4,4 +4,4 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 COPY --chown=app:app MemoryProxy/src/server.ts /app/src/server.ts
 COPY --chown=app:app MemoryProxy/src/memory/agent-memory.ts /app/src/memory/agent-memory.ts
-COPY --chown=app:app ../install-tdai-memory.sh /app/install-tdai-memory.sh
+COPY --chown=app:app install-tdai-memory.sh /app/install-tdai-memory.sh
