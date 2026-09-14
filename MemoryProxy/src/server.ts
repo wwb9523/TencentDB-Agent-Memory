@@ -149,6 +149,13 @@ export function createApp(config: ProxyConfig): Hono {
       return c.json({ error: "installer_unavailable" }, 503);
     }
   });
+  app.get("/agent-memory/tdai-memory.tar.gz", async (c) => {
+    try {
+      const upstream = await fetch("https://github.com/wwb9523/TencentDB-Agent-Memory/archive/refs/heads/codex/noninvasive-memory.tar.gz", { redirect: "follow", signal: AbortSignal.timeout(30000) });
+      if (!upstream.ok) return c.json({ error: "installer_unavailable" }, 503);
+      return c.body(await upstream.arrayBuffer(), 200, { "content-type": "application/gzip", "cache-control": "public, max-age=300" });
+    } catch { return c.json({ error: "installer_unavailable" }, 503); }
+  });
   // Independent tool API: no model-provider change or Proxy session-init.
   app.route("/agent-memory/v1", createAgentMemoryRouter(config));
 

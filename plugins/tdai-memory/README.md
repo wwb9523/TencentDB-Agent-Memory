@@ -46,7 +46,7 @@ bash deploy/global-images/deploy-agent-memory.sh --apply
 curl -fsSL http://95.40.122.137:8096/agent-memory/install.sh | bash
 ```
 
-脚本需要 `curl`、`tar`、`python3` 和 `codex`。默认把源码保存到 `~/.local/share/tdai-memory`；可用 `TDAI_MEMORY_ENDPOINT` 或 `TDAI_MEMORY_INSTALL_ROOT` 覆盖默认值。它不会修改 `model_provider`、provider 配置或模型 Key。执行过程中会隐藏读取 Memory Hub Key，并让用户选择自己拥有的 active Agent。
+脚本需要 `curl`、`tar`、`python3` 和 `codex`。安装包和脚本均从记忆服务器下载（服务器内部再同步 GitHub 固定分支）；默认把源码保存到 `~/.local/share/tdai-memory`。可用 `TDAI_MEMORY_ENDPOINT` 或 `TDAI_MEMORY_INSTALL_ROOT` 覆盖默认值。它不会修改 `model_provider`、provider 配置或模型 Key。执行过程中会隐藏读取 Memory Hub Key，并让用户选择自己拥有的 active Agent。
 
 也可以先下载后审阅再执行：
 
