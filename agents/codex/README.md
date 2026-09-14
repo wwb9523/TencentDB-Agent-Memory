@@ -1,8 +1,12 @@
 # Codex
 
+> **推荐：不修改模型 provider。** 使用 [TDAI Memory 插件](../../plugins/tdai-memory/README.md)，通过 Hooks 自动召回 / 回写，通过 MCP 按需查询。下文介绍的是已有的模型代理接入方式。
+
 > agentSource: `codex` | 协议: OpenAI Responses API | Handler: `codexHandler.ts` (独立)
 >
 > 本地历史导入 Memory Hub：见 [资产导入手册](./asset-import.md)。
+
+> 团队成员接入公网 Memory Proxy：见 [本机 Codex 接入指南](./接入指南.md)（含管理员准备、CLI / 桌面配置、验收与回退）。
 
 ---
 

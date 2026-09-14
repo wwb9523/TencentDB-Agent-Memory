@@ -1,0 +1,24 @@
+{
+  "name": "tdai-memory",
+  "version": "0.1.0",
+  "description": "Provider-independent L0–L3 memory for Codex using hooks and MCP.",
+  "author": {
+    "name": "TDAI Memory contributors"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "TDAI Memory",
+    "shortDescription": "Recall and capture memories with your own model provider.",
+    "longDescription": "Hooks retrieve context before prompts and optionally save completed turns. MCP provides on-demand memory tools.",
+    "developerName": "TDAI Memory contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": "Recall relevant project decisions from my TDAI memory."
+  },
+  "mcpServers": "./.mcp.json",
+  "license": "MIT",
+  "repository": "https://github.com/wwb9523/TencentDB-Agent-Memory"
+}

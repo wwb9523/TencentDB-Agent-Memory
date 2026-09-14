@@ -1,0 +1,6 @@
+# Add the independent memory API to a pinned, already-running Proxy image.
+# Pass the existing image ID/digest as BASE_IMAGE; no dependency downloads.
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+COPY --chown=app:app src/server.ts /app/src/server.ts
+COPY --chown=app:app src/memory/agent-memory.ts /app/src/memory/agent-memory.ts

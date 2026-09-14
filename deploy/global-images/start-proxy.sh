@@ -156,6 +156,7 @@ $DOCKER run -d --name "$CONTAINER" \
   --add-host=host.docker.internal:host-gateway \
   -p "${PROXY_PORT}:8096" \
   -v "$CONFIG_FILE:/data/config.yaml:ro" \
+  -v "${PROXY_STATE_VOLUME:-tdai-proxy-state}:/data/tdai-memory-proxy" \
   "$PROXY_IMAGE" >/dev/null
 
 wait_healthy "$CONTAINER" 90

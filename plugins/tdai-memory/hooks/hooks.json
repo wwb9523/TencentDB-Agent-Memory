@@ -1,0 +1,6 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/memory.py\" hook", "timeout": 20, "statusMessage": "Recalling TDAI memory", "additionalContextLimit": 4000}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/memory.py\" hook", "timeout": 20, "statusMessage": "Saving TDAI memory"}]}]
+  }
+}
